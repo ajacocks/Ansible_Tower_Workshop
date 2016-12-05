@@ -33,6 +33,141 @@ image::ansible-lab-figure01-logon-screen.png[caption="Figure 1: ", title="Ansibl
 
 In order to save a fair amount of time during this lab we have built out several of the constructs that Tower uses to organize itself into a enterprise, multi-tenant deployment tool. Instead of doing those live, we will walk through them quickly here so we can get to the good stuff sooner.
 
+=== Initial Environment Creation
+
+The Tower server, and any user-created clients, reside on Amazon EC2.  In order to access EC2, from the command-line, the AWS CLI environment package must be installed.  The AWS CLI package is available in EPEL.
+
+To install it:
+[source,bash]
+----
+$ sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+$ sudo yum install awscli
+----
+
+If you don't already have it, you will also need Ansible:
+[source,bash]
+----
+$ sudo yum install ansible python2-boto
+----
+
+Also needed is the 64bit Linux version of Terraform, by Hashicorp.  Download that from link:https://www.terraform.io/downloads.html[Hashicorp], to `/tmp/`.
+
+To install it:
+[source,shell]
+----
+$ cd /usr/local/bin
+$ sudo unzip /tmp/terraform*.zip
+$ sudo chmod 0755 terraform
+----
+
+We will also require git, in order to access the source repositories, containing the workshop content.
+
+To install it:
+[source,shell]
+----
+$ sudo yum install git
+----
+
+Next, check out the repositories needed:
+[source,shell]
+----
+$ mkdir ~/src
+$ cd ~/src
+$ git clone https://github.com/ajacocks/Ansible.git
+$ git clone https://github.com/ajacocks/Ansible_Tower.git
+----
+
+Next, you will need to define environment variables containing your AWS API keys.  You also need to have IAM permissions set to allow you to create resources within AWS.  You can create AWS API keys, if you don't already have them, by going to 'My Security Credentials' and then to 'Access Keys (Access Key ID and Secret Access Key)'.
+
+To set the API keys:
+[source,bash]
+----
+$ export AWS_ACCESS_KEY_ID='****************WFQ'
+$ export AWS_SECRET_ACCESS_KEY='****************TFHJw'
+----
+
+To locate your AWS Route 53 zone ID:
+[source,shell]
+----
+$ ZONE_ID=`aws route53 list-hosted-zones --query 'HostedZones[*]' --output text | grep '\/hostedzone\/' | sed -e 's/.*\///' -e 's/[^a-zA-Z0-9].*//'`
+----
+
+Also, the API keys must be added to the file '~/src/Ansible_Tower/roles/aws.infra.terraform/vars/main.yml':
+[source,shell]
+----
+$ cd ~/src/Ansible_Tower
+$ sed -i "s/^zone_id:.*/zone_id: \"${ZONE_ID}\"/" roles/aws.infra.terraform/vars/main.yml
+$ sed -i 's/^aws_access_key:.*/aws_access_key: "****************WFQ"/' roles/aws.infra.terraform/vars/main.yml
+$ sed -i 's/^aws_secret_key:.*/aws_secret_key: "****************TFHJw"/' roles/aws.infra.terraform/vars/main.yml
+----
+
+Next, create the environment, by launching the Ansible playbook does the heavy lifting:
+
+[source,shell]
+----
+$ ansible-playbook -i inventory aws_infra_terraform.yml --tags "tf_create"
+----
+
+=== Configuration
+
+After the environment is created, you can then do most of the configuration, for this lab, by running the following Ansible playbook:
+
+[source,shell]
+----
+$ ansible-playbook -i inventory aws_ec2_instance.yml
+----
+
+Once that script completes, you may want to login to the AWS EC2 console, and delete extra unneeded nodes.  You can safely terminate any node that starts with `node`, for instance `node16`.
+
+Now that the environment is built, we can update the Ansible playbooks that the students will be using, in the exercises.  First, let's determine the EC2 security group and subnet ID:
+
+[source,shell]
+----
+$ SUBNET_ID=`aws ec2 describe-subnets --region us-east-1 --query 'Subnets[*].[SubnetId]' --filters Name=tag:Name,Values=ansible-tower-public-subnet --output text`
+$ SECURITY_GROUP=`aws ec2 describe-security-groups --region us-east-1 --query 'SecurityGroups[*].[GroupId]' --filters Name=group-name,Values=ansible-tower-sg --output text`
+----
+
+Now, we can update the Ansible playbooks.
+
+[source,shell]
+----
+$ cd ~/src/Ansible
+$ sed -i -e "s/group_id: .*/group_id: ${SECURITY_GROUP}/" -e "s/vpc_subnet_id: .*/vpc_subnet_id: ${SUBNET_ID}/" provision_ec2/roles/ec2_common/tasks/main.yml
+$ git add provision_ec2/roles/ec2_common/tasks/main.yml
+$ git commit -m 'update subnet ID and security group to match current instance'
+$ git push
+----
+
+=== Initial Logon
+
+Browse to URL of your Tower server (defaults to link:https://ansible.tower.redhat-fierce.io[https://ansible.tower.redhat-fierce.io]) of the EC2 instance and enter the `admin` password located in `roles/ansible.tower/vars/main.yml`.
+
+[source,shell]
+----
+$ egrep '^tower_admin_passwd:' roles/ansible.tower/vars/main.yml
+----
+
+=== Licensing
+
+Now, let's add your Ansible Tower license key.
+
+* Login to the Tower Server, if you have not yet done so.
+* Go to the `SETTINGS` page, by licking on the image:button_ansible_tower_settings.png[Title="Settings Button"] (settings) button, located in the top right corner of the screen.
+* Click on `VIEW YOUR LICENSE`. 
+* Click `BROWSE`.
+* Check the box next to `I agree to the End User License Agreement`.
+* Click `SUBMIT`, and if your license was accepted, the license details shown on the left half of the screen should have changed to those in your license.
+
+=== Shutdown
+
+After the workshop completes, you can tear the environment down, using Terraform.  You will have to manually terminate any node created by a student.
+
+[source,shell]
+----
+$ cd /tmp/terraform
+$ terraform destroy -force
+----
+
 === Settings
 
 The `settings` menu (the little gear in the top right corner) is where you do a lot of your initial work to configure Ansible Tower. Within it are 8 options (9 if you include 'About')
