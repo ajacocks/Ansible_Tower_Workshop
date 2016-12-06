@@ -14,14 +14,16 @@ Please create a new project, based on the image in Figure 7, above.
 
 image::lab_project_permissions.png[caption="Figure 7b: ", title="Setting Permissions on a New Project"]
 
-Next, set permissions on the project to match those in the figure, above:
-
-* Click the white 'PERMISSIONS' button.
-* Click the green '+ADD' button.
-* Click the 'TEAMS' button.
-* Check the box next to 'Lab-Team'.
-* Add the 'Use' and 'Update' roles.
-* Click the green 'SAVE' button.
+[TIP]
+.Next, set permissions on the project to match those in the figure, above:
+====
+. Click the white 'PERMISSIONS' button.
+. Click the green '+ADD' button.
+. Click the 'TEAMS' button.
+. Check the box next to 'Lab-Team'.
+. Add the 'Use' and 'Update' roles.
+. Click the green 'SAVE' button.
+====
 
 ==== Lab Playbooks Source Code
 
@@ -36,13 +38,15 @@ In Ansible Tower, inventories are how you track and group your systems so you ca
 
 image::ansible-lab-figure09-inventory.png[caption="Figure 8a: ", title="Creating a new Inventory"]
 
-Next, add permissions to that inventory:
-
-* Click the white 'PERMISSIONS' button.
-* Click the green '+ADD' button.
-* Click the white 'TEAMS' button.
-* Click the check box next to the 'Lab-Team' organization.
-* Add the 'AD HOC' and 'USE' roles.
+[TIP]
+.Next, add permissions to that inventory:
+====
+. Click the white 'PERMISSIONS' button.
+. Click the green '+ADD' button.
+. Click the white 'TEAMS' button.
+. Click the check box next to the 'Lab-Team' organization.
+. Add the 'AD HOC' and 'USE' roles.
+====
 
 image::inventory_permissions.png[caption="Figure 8b: ", title="Setting Permissions on an Inventory"]
 
@@ -50,7 +54,7 @@ Please create your inventory based on the content in Figure 9, above.
 
 ==== Groups
 
-Once an Inventory is created, you are presented with a Group and Hosts screen. For AWS, we want to create a group that will dynamically go out to a given region of AWS (us-west-2 in our case today) and use our Cloud Credential to log in to AWS to pull down information about all of our hosts.
+Once an Inventory is created, you are presented with a Group and Hosts screen. For AWS, we want to create a group that will dynamically go out to a given region of AWS (us-east-1 in our case today) and use our Cloud Credential to log in to AWS to pull down information about all of our hosts.
 
 If you were managing inventories around your own datacenter you may want to create hosts individually depending on your source of Inventory. Ansible Tower has many options including CloudForms and Satellite that can be used as data sources.
 
@@ -62,11 +66,13 @@ Once our AWS Group was created, we click on the `Start Sync Process` icon on the
 
 image::ansible-lab-figure11-populated-inventory.png[caption="Figure 10a: ", title="Populated EC2 Hosts"]
 
-Once the host group list is created, manually add an entry for the Ansible Tower host:
-
-* Click the green '+ADD HOST' button.
-* Enter '127.0.0.1' in the 'HOST NAME' field.
-* Click the green 'SAVE' button.
+[TIP]
+.Once the host group list is created, manually add an entry for the Ansible Tower host:
+====
+. Click the green '+ADD HOST' button.
+. Enter '127.0.0.1' in the 'HOST NAME' field.
+. Click the green 'SAVE' button.
+====
 
 image::inventory_add_host.png[caption="Figure 10b: ", title="Manually Adding a Host"]
 
@@ -76,3 +82,12 @@ You can also schedule regular sync processes from the Inventories screen. This i
 
 image::ansible-lab-figure12-scheduled-updates.png[caption="Figure 11: ", title="Scheduling EC2 Group Updates"]
 
+[TIP]
+.Add a schedule for automatic group synchronization:
+====
+. Click on `INVENTORIES`.
+. Click on `ansible-ec2-instances`.
+. Click on the image:button_inventory_group_schedule.png[Title="Schedule Button"] (schedule) button.
+. Click on the image:button_add.png[Title="Add Button"] button.
+. Fill in the details from the figure, above.
+====
