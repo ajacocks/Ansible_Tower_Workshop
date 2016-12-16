@@ -24,7 +24,7 @@ You will be prompted for a survey when you launch a Job based on this Job Templa
 
 === Playbook Tags
 
-If you look at the link:https://github.com/dischord01/Ansible_Tower_Workshop/blob/master/roles/ansible.tower/tasks/user_setup.yml[playbook role that creates users in Tower], you will notice that the tasks have tags associated with them.
+If you look at the link:https://github.com/ajacocks/Ansible/blob/master/provision_ec2/roles/ec2_common/tasks/main.yml[playbook role that creates Amazon EC2 guests in Tower], you will notice that the tasks have tags associated with them.
 
 [source,yaml]
 ----

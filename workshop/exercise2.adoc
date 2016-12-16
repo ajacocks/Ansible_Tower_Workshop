@@ -7,9 +7,9 @@ If you are having trouble creating an instance or two, shout loud and start wavi
 
 === Creating Amazon Tags
 
-Now that we all have our own vm's created, let's do some work with them. First off, we need a way to distinguish your systems from the other lab systems that we just created. Luckily, we've already thought of that for us.
+Now that all of the individiual VMs are created, we can do some work with them. First off, we need a way to distinguish your systems from the other lab systems that we just created. Luckily, there is an easy way to do that.
 
-Each instance that was created in EC2 had two tags attached to it as well. The first, `ansible_lab`, is the same for everyone. It allows us to easily find and remove these test instances at the end of our lab today. After all, EC2 is cheap, but it ain't free. :)
+Each instance that was created in EC2 had two tags attached to it as well. The first, `ansible_lab`, is the same for everyone. It allows us to easily find and remove these test instances at the end of our lab today.
 
 The second tag is called `user_id`, and is set to the value that you set when you ran you EC2 Creation Job.
 
@@ -33,7 +33,7 @@ They are created with the taxonomy:
 
 `tag_tagname_tagvalue`
 
-For example, for our `user_id` tag, when I used `jduncan` as the value in my Job Template, Tower created the tag `tag_user_id_jduncan`.
+For example, for our `user_id` tag, when I used `student25` as the value in my Job Template, Tower created the tag `tag_user_id_jduncan`.
 
 In the Inventories page, I can select these tag groups and do work on them as a whole.
 

@@ -2,13 +2,11 @@
 
 = Exercise Four - Creating a Job Template
 
-At this point, we can confidently navigate and we have gone through (almost) all of the major concepts in Ansible Tower. The final scripted exercise we have scheduled for today is going through the process around creating a Job Template.
+At this point, we can confidently navigate and have explored several of the major features of Ansible Tower. The final scripted exercise we have scheduled for today is going through the process around the creation of a Job Template.
 
-Like we talked about earlier, a Job Template takes all of the other components that are tracked in Ansible Tower and brings them together to do actual work. To do a job.
+Like we talked about earlier, a Job Template takes all of the other components that are tracked in Ansible Tower (inventory, project, playbook, and credentials) and brings them together into an executable package.
 
-It's usually pretty straightforward.
-
-The thing that you have to do, though, is account for ALL of the variables that your playbook needs. These either have to be account for in:
+The thing that you have to do, though, is to account for ALL of the variables that your playbook needs. These either have to be specified in:
 
 * your playbook role itself (in the code)
 * in your Job Templates `Extra Variables` field
@@ -81,19 +79,36 @@ For this example exercise, we will create a job template that will add system us
 
 * users - a dictionary of users with a name value
 * user_password - a password (encrypted)
-* user_state - to feed into the ansible task. There are a few valid options here.
+* user_state - whether the specified user should be created, or removed
 
 We will create a simple survey to handle all of this, along with prompting for our `Extra Variables` in the Job Template so we can dynamically create users for a given system or group of systems.
 
 image::add-users-student25-part1.png[caption="Figure 20: ", title="Creating a Job Template to Add Users (Part 1)"]
+
+[TIP]
+.Creation of Users via Job Template
+====
+* For the `NAME` field, input `add users studentX` where `X` is your student number
+* The `JOB TYPE` is `Run`
+* For `INVENTORY`, and `PROJECT`, pick the only selections available, specifically `ansible-ec2-instances` and `Lab-Project`
+* Pick `ansible-ec2-instances` as the `MACHINE CREDENTIAL`
+* In the `LIMIT` field, enter `tag_user_id_studentX`, where `X` is your student number
+* Notice that the `JOB TAGS` field is referencing the `users` tag that is defined in the role. This way this Job will only execute those tasks.
+* The user name is defined by the `users:` dictionary, in the `Extra Variables` section (shown below), and is automatically set to the user ID that you logged in to tower with.
+====
+
 image::add-users-student25-part2.png[caption="Figure 21: ", title="Creating a Job Template to Add Users (Part 2)"]
 
 [TIP]
-.A Few Important Items
+.Survey Configuration
 ====
-* We don't need Cloud Credentials since we are ssh-ing directly into the system to make changes
-* Notice the `Job Tags` field is referencing the `users` tag that is defined in the role. This way this Job will only execute those tasks.
-* The user name is defined by the `users:` dictionary, in the `Extra Variables` section, and is automatically set to the user ID that you logged in to tower with.
+* Click the blue `EDIT SURVEY` button, and fill out the fields, as follows:
+* `PROMPT` should be `USER STATE`, to indicate the creation or deletion of a user
+* `ANSWER VARIABLE NAME` should be `user_state`, specifying that the answer provided is stored in that variable, which is referenced in the Job Template
+* `ANSWER TYPE` is `Multiple Choice (single select)`, indicating that there are several possible selections, and only one should be selectable, at a time
+* `DEFAULT ANSWER` should be `present`, causing the default behavior to be user creation
+* Make sure that the `REQUIRED` checkbox is filled, indicating that the user has to fill out the form
+* NOTE: make sure that you click the green `SAVE` button, which may require you to horizontally scroll to the right, after creating the form
 ====
 
 image::add-users-student25-survey.png[caption="Figure 22: ", title="Creating a Job Template Survey"]
